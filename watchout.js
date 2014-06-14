@@ -24,6 +24,15 @@ var playerData = [{
   fill: 'black'
 }];
 
+var drag = d3.behavior.drag().on('drag', dragmove);
+
+function dragmove(d){
+  var x = d3.event.x;
+  var y = d3.event.y;
+  d3.select(this).attr('x', x-7.5)
+  .attr('y',y-7.5);
+}
+
 function updatePlayer(pData){
   var rect = svg.selectAll('rect')
     .data(pData);
@@ -39,8 +48,15 @@ function updatePlayer(pData){
       return d.width;
     }).attr('fill', function(d){
       return d.fill;
-    });
+    })
+    .call(drag);
 }
+
+//on mouse drag event, take in new position of mouse
+//and change player data to replect that
+//and then call the updatePlayer function again
+//
+
 
 updatePlayer(playerData);
 

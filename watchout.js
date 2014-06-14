@@ -11,16 +11,30 @@ var svg = d3.select('body').append('svg')
   }).append('g')
   .attr("transform", "translate(32,"+ (Game.height / 2) + ")");
 
-var alphabet = [12,23,29,36,51,67,72,85];
+// var alphabet= [12,23,29,36,51,67,72,85];
+// var alphabet = [[10,10],[14,20],[70,20],[15,25],[15,20],[55,30],[15,25]];
+var alphabet = [];
 
+var dataGen = function(n, arr){
+  for(var i = 0; i < n; i++){
+    var enemy = {};
+    enemy.cx = Math.random()*100;
+    enemy.cy = Math.random()*100;
+    enemy.r = Math.floor(Math.random()*50);
+    arr.push(enemy);
+  }
+  return arr;
+};
 
+alphabet = dataGen(15,alphabet);
 
 function update(someData) {
 
   // DATA JOIN
   // Join new data with old elements, if any.
   var circle = svg.selectAll("circle")
-      .data(someData, function(d){ return d;});
+      .data(someData);
+      // , function(d){ return d;});
 
   // UPDATE
   // Update old elements as needed.
@@ -29,18 +43,21 @@ function update(someData) {
   // ENTER
   // Create new elements as needed.
   circle.enter().append("circle")
-      .attr("class", "enter");
+      .attr("class", "enter")
+      .style('fill', 'blue');
 
   // ENTER + UPDATE
   // Appending to the enter selection expands the update selection to include
   // entering elements; so, operations on the update selection after appending to
   // the enter selection will apply to both entering and updating nodes.
   // text.text(function(d) { return d; });
-  circle.attr("cx", function(d, i) { return i * 12; })
-      .attr("cy", function(d){return d/2;})
-      .attr("r", '10')
+  circle.attr("cx", function(d, i) { return i * 100; })
+      .attr("cy", function(d,i){return (d.cy/2)*i;})
+      .attr("r", function(d){
+        return d.r;
+      })
       .style('fill', function(d){
-        if(d%2){
+        if(d.r%2){
           return 'red';
         } else{
           return 'blue';
@@ -58,8 +75,7 @@ update(alphabet);
 // Grab a random sample of letters from the alphabet, in alphabetical order.
 setInterval(function() {
   update(shuffle(alphabet)
-      .slice(0, Math.floor(Math.random() * 10))
-      .sort());
+      .slice(0, Math.floor(Math.random() * Game.numEnemies)));
 }, 1500);
 
 // Shuffles the input array.

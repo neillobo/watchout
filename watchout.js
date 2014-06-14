@@ -29,6 +29,7 @@ var drag = d3.behavior.drag().on('drag', dragmove);
 function dragmove(d){
   var x = d3.event.x;
   var y = d3.event.y;
+  console.log(this);
   d3.select(this).attr('x', x-7.5)
   .attr('y',y-7.5);
 }
@@ -92,12 +93,60 @@ function update(someData) {
   circle.enter().append("circle")
       .attr("class", "enter")
       // .style('fill', 'blue');
+      //
+  var checkCollision = function(player,enemy){
+  //access player x and y
+  //access enemy x and y
+  //compare for collision
+  //if so -> log COLLISION!
+    // console.log('In function');
+
+    var px = player.x;
+    var py = player.y;
+    var ex = enemy.attr('cx');
+    var ey = enemy.attr('cy');
+    var er = enemy.attr('r');
+
+    var distance = Math.sqrt(Math.pow((px-ex),2) + Math.pow((py-ey),2));
+    if(distance < er){
+      console.log('Collision!');
+      console.log(distance + ' '+px + ' : '+ py);
+    }
+  };
 
   // ENTER + UPDATE
   // Appending to the enter selection expands the update selection to include
   // entering elements; so, operations on the update selection after appending to
   // the enter selection will apply to both entering and updating nodes.
   // text.text(function(d) { return d; });
+  var tweenCollision = function(data){
+    var newPos={};
+    var enemy = d3.select(this);
+    var startPos = {
+      x: enemy.attr('cx'),
+      y: enemy.attr('cy'),
+      r: enemy.attr('r')
+    };
+    var endPos = {
+      x: data.cx,
+      y: data.cy,
+      r: data.r
+    };
+    return function(t){
+      //check for Collisions
+      //then define the next incremental position since in the tween function this is being
+      //called repeatedly and we need to keep track of the new position after time (t)
+      // console.log('In the tween function');
+      checkCollision(playerData[0],enemy);
+      newPos.x = startPos.x + (endPos.x - startPos.x)*t;
+      newPos.y = startPos.y + (endPos.y - startPos.y)*t;
+      newPos.r = startPos.r;
+      return enemy.attr('x',newPos.x).attr('y',newPos.y).attr('r',newPos.r);
+    };
+  };
+
+
+
   circle.transition().duration(1000)
       .attr("cx", function(d, i) { return d.cx; })
       .attr("cy", function(d,i){return d.cy;})
@@ -106,12 +155,27 @@ function update(someData) {
       })
       .attr('fill', function(d){
         return "rgb(" + (d.cx + d.cy)%255+ ","+d.cx%255+"," + d.cy%255 +")";
-      });
+      })
+      .tween('custom', tweenCollision);
 
   // EXIT
   // Remove old elements as needed.
   circle.exit().remove();
 }
+
+
+//collisions
+//check for collisions
+  //looks for distance between enemy and player
+    // if distance less than enemy.r + player.r -> COLLISION!
+    //
+
+
+
+
+
+
+
 
 // The initial display.
 update(enemyData);
@@ -121,6 +185,7 @@ setInterval(function() {
   // update(shuffle(enemyData)
   //     .slice(0, Math.floor(Math.random() * Game.numEnemies)));
   update(movement(enemyData));
+  updatePlayer(playerData);
 }, 1000);
 
 // Shuffles the input array.

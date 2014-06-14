@@ -29,9 +29,10 @@ var drag = d3.behavior.drag().on('drag', dragmove);
 function dragmove(d){
   var x = d3.event.x;
   var y = d3.event.y;
-  console.log(this);
-  d3.select(this).attr('x', x-7.5)
-  .attr('y',y-7.5);
+  d3.select(this).attr('x', x)
+  .attr('y',y);
+  playerData[0].x = x;
+  playerData[0].y = y;
 }
 
 function updatePlayer(pData){
@@ -108,9 +109,9 @@ function update(someData) {
     var er = enemy.attr('r');
 
     var distance = Math.sqrt(Math.pow((px-ex),2) + Math.pow((py-ey),2));
-    if(distance < er){
-      console.log('Collision!');
-      console.log(distance + ' '+px + ' : '+ py);
+    if(distance < er* 1.5){
+      //modify score
+      console.log('collision!');
     }
   };
 
@@ -185,7 +186,7 @@ setInterval(function() {
   // update(shuffle(enemyData)
   //     .slice(0, Math.floor(Math.random() * Game.numEnemies)));
   update(movement(enemyData));
-  updatePlayer(playerData);
+  // updatePlayer(playerData);
 }, 1000);
 
 // Shuffles the input array.

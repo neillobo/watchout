@@ -11,9 +11,40 @@ var svg = d3.select('body').append('svg')
   }).append('g');
   // .attr("transform", "translate(32,"+ (Game.height / 2) + ")");
 
-// var alphabet= [12,23,29,36,51,67,72,85];
-// var alphabet = [[10,10],[14,20],[70,20],[15,25],[15,20],[55,30],[15,25]];
-var alphabet = [];
+//Player is rectangle
+//Corresponds to a single object
+//Has initial position at height/2 width/2
+//new position = new mouse click ps
+//
+var playerData = [{
+  x: Game.width/2,
+  y: Game.height/2,
+  width: 15,
+  height: 15,
+  fill: 'black'
+}];
+
+function updatePlayer(pData){
+  var rect = svg.selectAll('rect')
+    .data(pData);
+
+  rect.enter().append('rect')
+    .attr('x', function(d){
+      return d.x;
+    }).attr('y', function(d){
+      return d.y;
+    }).attr('height', function(d){
+      return d.height;
+    }).attr('width', function(d){
+      return d.width;
+    }).attr('fill', function(d){
+      return d.fill;
+    });
+}
+
+updatePlayer(playerData);
+
+var enemyData = [];
 
 var dataGen = function(n, arr){
   for(var i = 0; i < n; i++){
@@ -26,7 +57,7 @@ var dataGen = function(n, arr){
   return arr;
 };
 
-alphabet = dataGen(15,alphabet);
+enemyData = dataGen(15,enemyData);
 
 function update(someData) {
 
@@ -51,7 +82,7 @@ function update(someData) {
   // entering elements; so, operations on the update selection after appending to
   // the enter selection will apply to both entering and updating nodes.
   // text.text(function(d) { return d; });
-  circle.transition().duration(500)
+  circle.transition().duration(1000)
       .attr("cx", function(d, i) { return d.cx; })
       .attr("cy", function(d,i){return d.cy;})
       .attr("r", function(d){
@@ -67,14 +98,14 @@ function update(someData) {
 }
 
 // The initial display.
-update(alphabet);
+update(enemyData);
 
-// Grab a random sample of letters from the alphabet, in alphabetical order.
+// Grab a random sample of letters from the enemyData, in alphabetical order.
 setInterval(function() {
-  // update(shuffle(alphabet)
+  // update(shuffle(enemyData)
   //     .slice(0, Math.floor(Math.random() * Game.numEnemies)));
-  update(movement(alphabet));
-}, 500);
+  update(movement(enemyData));
+}, 1000);
 
 // Shuffles the input array.
 function shuffle(array) {

@@ -1,7 +1,10 @@
 var Game = {
   width : 600,
   height : 500,
-  numEnemies : 10
+  numEnemies : 10,
+  score: 0,
+  highscore: 0,
+  collision: 0
 };
 
 var svg = d3.select('body').append('svg')
@@ -110,8 +113,10 @@ function update(someData) {
 
     var distance = Math.sqrt(Math.pow((px-ex),2) + Math.pow((py-ey),2));
     if(distance < er* 1.5){
-      //modify score
-      console.log('collision!');
+      Game.collision += 1;
+      d3.select('.collisions').selectAll('span').text(Game.collision);
+      Game.score =0;
+      d3.select('.current').selectAll('span').text(Game.score);
     }
   };
 
@@ -142,6 +147,8 @@ function update(someData) {
       newPos.x = startPos.x + (endPos.x - startPos.x)*t;
       newPos.y = startPos.y + (endPos.y - startPos.y)*t;
       newPos.r = startPos.r;
+
+
       return enemy.attr('x',newPos.x).attr('y',newPos.y).attr('r',newPos.r);
     };
   };
@@ -186,7 +193,13 @@ setInterval(function() {
   // update(shuffle(enemyData)
   //     .slice(0, Math.floor(Math.random() * Game.numEnemies)));
   update(movement(enemyData));
-  // updatePlayer(playerData);
+  Game.score +=5;
+  d3.select('.current').selectAll('span')
+    .text(Game.score);
+  if(Game.score > Game.highscore){
+    Game.highscore = Game.score;
+  }
+  d3.select('.high').selectAll('span').text(Game.highscore);
 }, 1000);
 
 // Shuffles the input array.
